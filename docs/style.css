@@ -88,7 +88,7 @@ body {
 }
 .login-container {
   width: 340px;
-  background: #fff;
+  background: linear-gradient(135deg, #f4f1ff 60%, #e6d6ff 100%);
   border-radius: 18px;
   box-shadow: 0 8px 32px rgba(122,73,229,0.08);
   padding: 48px 32px 36px 32px;
