@@ -24,7 +24,7 @@ def image_to_base64(img: Image.Image):
     return base64.b64encode(buffer.getvalue()).decode()
 
 
-def resize_image_if_needed(image, max_base64_len=1_000_000):
+def resize_image_if_needed(image, max_base64_len=1_200_000):
     from io import BytesIO
     scale = 1.0
     while True:
@@ -37,44 +37,36 @@ def resize_image_if_needed(image, max_base64_len=1_000_000):
         scale -= 0.05 
 
 
-def query_llm_with_image(image: Image.Image, page_num: int):
-    # print(image.width, image.height)
+def query_llm_with_image_and_text(image: Image.Image, page_text:str):
     b64_image = image_to_base64(image)
-
+    print(len(b64_image))
+    
     if len(b64_image) > 1_000_000:
         image = resize_image_if_needed(image)
         b64_image = image_to_base64(image)
     
-    # print("Image len:", len(b64_image))
+    print(len(b64_image))
 
     response = openai.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "system",
-                "content": "Ești un asistent care extrage informația din pagini de manuale medicale redactate în limba română."
+                "content": "Ești un asistent care validează informația extrasă dintr-o imagine cu text în limba română."
             },
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": f"""Aceasta este pagina {page_num} a unui manual medical în limba română.
+                        "text": f"""Aceasta este imaginea în limba română.
 
-Extrage absolut toată informația textuală vizibilă în imagine, fără a omite niciun cuvânt, indiferent unde este localizat în pagină (text, tabel, figură, margine, subsol, etichetă etc).
+Eu am încercat să extrag toată informația din imagine, fără a omite niciun cuvânt, în exact aceeași ordine în care ea apare în pagină, în următorul format:
 
-Format:
-Titlu: [...]
-Text:
-[...]
-Tabel:
-| ... | ... |
-| ... | ... |
-[FIGURĂ: nume]
-Descriere: [...]
-Elemente text: [...]
+{page_text}
 
-Dacă există orice fel de text pe pagină (oricât de mic, izolat sau în figură), trebuie inclus 100% în răspuns.
+Compară informația extrasă de mine cu informația pe care o vezi în pagină și te rog corectează orice diferențe între textul original din imagine și textul extras de mine din imagine. Am nevoie ca textul să fie 100% identic cu ce e în pagină, și din păcate prin extragere e posibil să se fi inclus reformulări. 
+Te rog fă toate corecțiile necesare acolo unde textul nu e 100% identic cu cel din pagină, și returnează, în același format, conținutul adaptat. Treci prin fiecare cuvânt din imagine și verifică dacă este identic cu cel din textul extras de mine. Nu au voie să apară reformulări, interpretări sau diferențe nici măcar la un cuvânt.
 """
                     },
                     {
@@ -86,7 +78,7 @@ Dacă există orice fel de text pe pagină (oricât de mic, izolat sau în figur
                 ]
             }
         ],
-        temperature=0.7
+        temperature=0.5
     )
     return response.choices[0].message.content
 
@@ -111,20 +103,32 @@ def process_pdf(query_book, query_chapter):
     global finished_pages
 
     pdf_path = f"{DATA_DIR}{query_book}/{chapters_id[query_book][query_chapter]}.pdf"
-    save_folder_path = f"{DATA_DIR}{query_book}/{chapters_id[query_book][query_chapter]}/"
+    extracted_data_path = f"{DATA_DIR}{query_book}/{chapters_id[query_book][query_chapter]}/"
+    save_folder_path = f"{DATA_DIR}{query_book}/{chapters_id[query_book][query_chapter]}_validated/"
+
     if not os.path.exists(save_folder_path):
         os.mkdir(save_folder_path)
     
-    pages = convert_from_path(pdf_path, dpi=100)
+    pages = convert_from_path(pdf_path, dpi=150)
     total_pages += len(pages)
+
     for i, page in enumerate(pages):
+        if i != 12:
+            continue
+
+        page_extracted_data_path = extracted_data_path + f"page_{i+1}.txt"
         page_save_path = save_folder_path + f"page_{i+1}.txt"
+
         if os.path.exists(page_save_path):
             finished_pages += 1
-            # print(f"Page {i+1} already done.")
+            
         else:
             print(f"Process page {i+1} / {len(pages)}")
-            result = query_llm_with_image(page, i+1)
+            with open(page_extracted_data_path, "r", encoding="utf-8") as file:
+                page_text = file.read()
+
+            result = query_llm_with_image_and_text(page, page_text)
+
             if len(result) < 200 or result.count("\n") == 0:
                 print(f"Process page {i+1} failed.")
                 print(result)
@@ -138,9 +142,13 @@ if __name__ == "__main__":
     chapters = json.load(open(CHAPTERS_FILEPATH, "r"))
     chapters_id = json.load(open(CHAPTERS_ID_PATH, "r"))
 
-    for query_book in ["kumar"]:
-        for query_chapter in list(chapters_id[query_book]):
-            print(f"Start working on {query_book}: {query_chapter}")
-            process_pdf(query_book, query_chapter)
+    # for query_book in ["kumar"]:
+    #     for query_chapter in list(chapters_id[query_book]):
+    #         print(f"Start validating on {query_book}: {query_chapter}")
+    #         process_pdf(query_book, query_chapter)
 
-            print("Success rate:", round(finished_pages/total_pages, 2)*100)
+    #         print("Success rate:", round(finished_pages/total_pages, 2)*100)
+    #         break
+    #     break
+
+    process_pdf(query_book="kumar", query_chapter="NEUROLOGIE")
