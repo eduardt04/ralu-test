@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Întrebări Diabet</title>
+  <title>Login - MedQ</title>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <!-- Custom JS -->
-  <script defer src="../src/firebase-config.js"></script>
-  <script defer src="../src/login.js"></script>
+  <script defer src="src/firebase-config.js"></script>
+  <script defer src="src/login.js"></script>
 </head>
 <body>
   <div class="login-container">
-    <h1>Autentificare</h1>
+    <h1>Login</h1>
     <form id="loginForm">
       <label for="email">Email:</label>
       <input type="email" id="email" required />
 
-      <label for="password">Parolă:</label>
+      <label for="password">Password:</label>
       <input type="password" id="password" required />
 
-      <button type="submit">Conectare</button>
+      <button type="submit">Login</button>
     </form>
     <p id="error-message"></p>
   </div>
