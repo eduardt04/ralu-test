@@ -13,7 +13,7 @@ loginForm.addEventListener('submit', async (e) => {
   try {
     await auth.signInWithEmailAndPassword(email, password);
     // Redirect on success
-    window.location.href = 'dashboard.html';
+    window.location.href = 'main.html';
   } catch (error) {
     errorMessage.textContent = error.message;
   }
