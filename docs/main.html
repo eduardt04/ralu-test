@@ -11,7 +11,7 @@
     body {
       margin: 0;
       font-family: 'Inter', Arial, sans-serif;
-      background: linear-gradient(120deg, #232526 0%, #414345 100%);
+      background: linear-gradient(135deg, #232526 0%, #3a6186 100%);
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -22,10 +22,10 @@
       top: 0;
       width: 300px;
       height: 100vh;
-      background: linear-gradient(160deg, #1a1a1a 60%, #232526 100%);
+      background: linear-gradient(160deg, #232526 60%, #3a6186 100%);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       box-shadow: 2px 0 10px rgba(0,0,0,0.2);
       z-index: 100;
     }
@@ -45,7 +45,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-fill-color: transparent;
       margin-bottom: 24px;
       text-align: center;
       user-select: none;
@@ -57,29 +56,10 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-fill-color: transparent;
       font-weight: 900;
       font-size: 2.7rem;
       letter-spacing: 0.01em;
       text-shadow: 0 2px 12px rgba(221, 36, 118, 0.15);
-    }
-    .search-bar {
-      width: 80%;
-      background: #232526;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      margin-bottom: 32px;
-      color: #fff;
-      font-size: 15px;
-      border: 1px solid #333;
-    }
-    .search-bar svg {
-      width: 18px;
-      height: 18px;
-      margin-right: 8px;
-      fill: #fff;
     }
     .sidebar-menu {
       width: 100%;
@@ -95,18 +75,25 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 16px;
-      padding: 10px 0 10px 8px;
+      padding: 10px 8px 10px 8px;
       border-radius: 6px;
       transition: background 0.2s;
       color: #fff;
+      justify-content: space-between;
     }
     .menu-title:hover, .menu-title.active {
       background: linear-gradient(90deg, #3a3a3a 60%, #414345 100%);
       color: #fff;
     }
     .caret {
-      margin-left: auto;
+      width: 16px;
+      height: 16px;
+      margin-left: 8px;
+      margin-right: 0;
+      fill: #fff;
       transition: transform 0.2s;
+      flex-shrink: 0;
+      display: inline-block;
     }
     .caret.down {
       transform: rotate(90deg);
@@ -124,11 +111,14 @@
     .submenu .submenu-title {
       font-weight: 500;
       font-size: 15px;
-      padding: 8px 0 8px 8px;
+      padding: 8px 8px 8px 8px;
       border-radius: 5px;
       cursor: pointer;
       color: #e0e0e0;
       transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .submenu .submenu-title:hover, .submenu .submenu-title.active {
       background: #333;
@@ -149,48 +139,11 @@
       font-weight: 600;
       border-left: 4px solid #fff;
     }
-    .sidebar-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 24px;
-      border-top: 1px solid #232526;
-      background: #181818;
-    }
-    .footer-icons {
-      display: flex;
-      gap: 12px;
-    }
-    .footer-icons svg {
-      width: 22px;
-      height: 22px;
-      fill: #888;
-      cursor: pointer;
-      transition: fill 0.2s;
-    }
-    .footer-icons svg:hover {
-      fill: #fff;
-    }
-    .lang-switcher {
-      background: #232526;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 16px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s, color 0.2s;
-    }
-    .lang-switcher:hover {
-      background: #fff;
-      color: #232526;
-    }
     .main-content {
       margin-left: 300px;
       padding: 40px;
       flex: 1;
-      background: linear-gradient(120deg, #232526 0%, #414345 100%);
+      background: linear-gradient(120deg, #232526 0%, #3a6186 100%);
       min-height: 100vh;
     }
   </style>
@@ -201,20 +154,16 @@
       <div class="sidebar-top">
         <!-- MedQ text logo -->
         <div class="medq-logo">Med<span>Q</span></div>
-        <div class="search-bar">
-          <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
-          <span>Search</span>
-        </div>
       </div>
       <nav class="sidebar-menu">
         <div class="menu-category">
           <div class="menu-title" data-menu="questionaries">
-            Questionaries
+            <span>Questionaries</span>
             <svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>
           </div>
           <div class="submenu" id="submenu-questionaries">
             <div class="submenu-title" data-menu="kumar">
-              Kumar
+              <span>Kumar</span>
               <svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>
             </div>
             <div class="submenu" id="submenu-kumar">
@@ -228,17 +177,10 @@
         </div>
         <div class="menu-category">
           <div class="menu-title" data-menu="results">
-            Results
+            <span>Results</span>
           </div>
         </div>
       </nav>
-    </div>
-    <div class="sidebar-footer">
-      <div class="footer-icons">
-        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6m5-8V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h3v4h4v-4h3a2 2 0 0 0 2-2z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
-      </div>
-      <button class="lang-switcher">DE</button>
     </div>
   </div>
   <div class="main-content">
