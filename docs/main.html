@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script defer src="src/firebase-config.js"></script>
+  <script src="src/firebase-config.js"></script>
   <script defer src="src/sidebar.js"></script>
   <style>
     body {
@@ -199,7 +199,6 @@
     });
 
     // --- Questionnaire logic for Kumar > Diabetul Zaharat ---
-    // Only run after DOMContentLoaded
     document.addEventListener('DOMContentLoaded', function () {
       const diabetBtn = document.querySelector('.submenu-title[data-menu="diabetul"]');
       const sepsisBtn = document.querySelector('.submenu-title[data-menu="sepsisul"]');
@@ -208,7 +207,6 @@
       let allQuestions = [];
       let currentIndex = 0;
 
-      // Helper to render a question
       function renderQuestion(idx) {
         const q = allQuestions[idx];
         if (!q) return;
@@ -246,7 +244,6 @@
       }
 
       async function loadQuestions(folder) {
-        // Find all .txt files in the folder (assume 1.txt to 99.txt max)
         allQuestions = [];
         for (let i = 1; i <= 99; i++) {
           try {
