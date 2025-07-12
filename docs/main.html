@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script src="src/firebase-config.js"></script>
   <script defer src="src/sidebar.js"></script>
   <style>
@@ -198,7 +199,7 @@
       }
     });
 
-    // --- Questionnaire logic for Kumar > Diabetul Zaharat ---
+    // --- Questionnaire logic for Kumar chapters from Firestore ---
     document.addEventListener('DOMContentLoaded', function () {
       const diabetBtn = document.querySelector('.submenu-title[data-menu="diabetul"]');
       const sepsisBtn = document.querySelector('.submenu-title[data-menu="sepsisul"]');
@@ -243,28 +244,29 @@
         };
       }
 
-      async function loadQuestions(folder) {
+      async function loadQuestionsFirestore(chapterId) {
         allQuestions = [];
-        for (let i = 1; i <= 99; i++) {
-          try {
-            const res = await fetch(`/data/kumar/questions/${folder}/${i}.txt`);
-            if (!res.ok) break;
-            const arr = await res.json();
-            allQuestions.push(...arr);
-          } catch (e) { break; }
-        }
+        const snapshot = await firebase.firestore()
+          .collection('kumar_questions')
+          .doc(chapterId)
+          .collection('questions')
+          .get();
+        snapshot.forEach(doc => {
+          allQuestions.push(doc.data());
+        });
+        allQuestions.sort((a, b) => (a.id || '').localeCompare(b.id || ''));
         currentIndex = 0;
         renderQuestion(currentIndex);
       }
 
       diabetBtn.addEventListener('click', function () {
-        loadQuestions('23');
+        loadQuestionsFirestore('diabetul_zaharat');
       });
       sepsisBtn.addEventListener('click', function () {
-        loadQuestions('8');
+        loadQuestionsFirestore('sepsisul');
       });
       endoBtn.addEventListener('click', function () {
-        loadQuestions('21');
+        loadQuestionsFirestore('endocrinologie');
       });
     });
   </script>
