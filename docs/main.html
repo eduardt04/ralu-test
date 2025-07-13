@@ -166,17 +166,7 @@
             <svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>
           </div>
           <div class="submenu" id="submenu-questionaries">
-            <div class="submenu-title" data-menu="kumar">
-              <span>Kumar</span>
-              <svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>
-            </div>
-            <div class="submenu" id="submenu-kumar">
-              <div class="submenu-title" data-menu="diabetul">DIABETUL ZAHARAT</div>
-              <div class="submenu-title" data-menu="sepsisul">SEPSISUL ȘI TRATAMENTUL INFECȚIILOR BACTERIENE</div>
-              <div class="submenu-title" data-menu="endocrinologie">ENDOCRINOLOGIE</div>
-            </div>
-            <div class="submenu-title" data-menu="lawrence">Lawrence</div>
-            <div class="submenu-title" data-menu="sinopsis">Sinopsis</div>
+            <!-- Book submenus will be inserted here by JS -->
           </div>
         </div>
         <div class="menu-category">
@@ -191,6 +181,8 @@
     <h1>Welcome!</h1>
     <p>Select a menu item from the left to get started.</p>
   </div>
+  <script src="src/sidebar.js"></script>
+  <script src="src/main-menu.js"></script>
   <script>
     // Check if user is authenticated
     firebase.auth().onAuthStateChanged(function(user) {
@@ -201,9 +193,6 @@
 
     // --- Questionnaire logic for Kumar chapters from Firestore ---
     document.addEventListener('DOMContentLoaded', function () {
-      const diabetBtn = document.querySelector('.submenu-title[data-menu="diabetul"]');
-      const sepsisBtn = document.querySelector('.submenu-title[data-menu="sepsisul"]');
-      const endoBtn = document.querySelector('.submenu-title[data-menu="endocrinologie"]');
       const mainContent = document.getElementById('main-content');
       let allQuestions = [];
       let currentIndex = 0;
@@ -259,15 +248,46 @@
         renderQuestion(currentIndex);
       }
 
-      diabetBtn.addEventListener('click', function () {
-        loadQuestionsFirestore('diabetul_zaharat');
-      });
-      sepsisBtn.addEventListener('click', function () {
-        loadQuestionsFirestore('sepsisul');
-      });
-      endoBtn.addEventListener('click', function () {
-        loadQuestionsFirestore('endocrinologie');
-      });
+      // Dynamic menu population for books and chapters
+      async function loadMenu() {
+        const snapshot = await firebase.firestore().collection('kumar_questions').get();
+        snapshot.forEach(doc => {
+          const chapterId = doc.id;
+          const chapterData = doc.data();
+          const bookDiv = document.createElement('div');
+          bookDiv.classList.add('submenu-title');
+          bookDiv.setAttribute('data-menu', chapterId);
+          bookDiv.innerHTML = `
+            <span>${chapterData.nume_capitol}</span>
+            <svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>
+          `;
+          document.getElementById('submenu-questionaries').appendChild(bookDiv);
+
+          const questionsDiv = document.createElement('div');
+          questionsDiv.classList.add('submenu');
+          questionsDiv.setAttribute('id', `submenu-${chapterId}`);
+          bookDiv.appendChild(questionsDiv);
+
+          chapterData.intrebari.forEach((intrebare, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('submenu-title');
+            questionDiv.setAttribute('data-menu', `${chapterId}_${index}`);
+            questionDiv.textContent = `Întrebarea ${index + 1}`;
+            questionsDiv.appendChild(questionDiv);
+          });
+
+          bookDiv.addEventListener('click', function () {
+            const isOpen = questionsDiv.classList.toggle('open');
+            if (isOpen) {
+              loadQuestionsFirestore(chapterId);
+            } else {
+              mainContent.innerHTML = '<h1>Welcome!</h1><p>Select a menu item from the left to get started.</p>';
+            }
+          });
+        });
+      }
+
+      loadMenu();
     });
   </script>
 </body>

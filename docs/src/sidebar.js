@@ -21,13 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleSubmenu('questionaries', 'submenu-questionaries');
   });
 
-  // Submenu: Kumar
-  const kumarMenu = document.querySelector('.submenu-title[data-menu="kumar"]');
-  kumarMenu.addEventListener('click', function (e) {
-    e.stopPropagation();
-    toggleSubmenu('kumar', 'submenu-kumar');
-  });
-
   // Optionally, you can add active state logic for submenu items
   const submenuTitles = document.querySelectorAll('.submenu-title');
   submenuTitles.forEach(function (item) {
