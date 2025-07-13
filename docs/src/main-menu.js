@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const chaptersSubmenu = document.createElement('div');
     chaptersSubmenu.className = 'submenu';
     chaptersSubmenu.id = `submenu-${bookKey}`;
-    chaptersSubmenu.style.display = 'none';
     Object.entries(chaptersData[bookKey]).forEach(([chapterName, chapterId]) => {
       const chapterDiv = document.createElement('div');
       chapterDiv.className = 'submenu-title';
