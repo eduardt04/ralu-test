@@ -110,6 +110,8 @@ document.addEventListener('DOMContentLoaded', function () {
         function renderQuestion(idx) {
           const q = allQuestions[idx];
           if (!q) { return; }
+          // Determine if the question allows multiple answers
+          const isMultiple = Array.isArray(q["Răspuns corect multiplu"]) && q["Răspuns corect multiplu"].length > 1;
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
@@ -118,16 +120,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="options">
                   ${(q.Variante || []).map(opt => `
                     <label class="option-label">
-                      <input type="radio" name="option" value="${opt}" required />
-                      ${opt}
+                      <input type="${isMultiple ? 'checkbox' : 'radio'}" name="option" value="${opt}" ${isMultiple ? '' : 'required'} />
+                      <span>${opt}</span>
                     </label>
                   `).join('')}
                 </div>
-                <button type="submit">Răspunde</button>
+                <button type="submit" class="question-btn">Răspunde</button>
               </form>
               <div class="question-nav">
-                <button id="prevQ" ${idx === 0 ? 'disabled' : ''}>Întrebarea anterioară</button>
-                <button id="nextQ" ${idx === allQuestions.length - 1 ? 'disabled' : ''}>Întrebarea următoare</button>
+                <button id="prevQ" class="question-btn" ${idx === 0 ? 'disabled' : ''}>Întrebarea anterioară</button>
+                <button id="nextQ" class="question-btn" ${idx === allQuestions.length - 1 ? 'disabled' : ''}>Întrebarea următoare</button>
               </div>
             </div>
           `;
