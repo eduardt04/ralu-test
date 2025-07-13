@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Main menu: Questionaries
   const questionariesMenu = document.querySelector('.menu-title[data-menu="questionaries"]');
   questionariesMenu.addEventListener('click', function () {
+    console.log('Questionaries menu clicked');
     toggleSubmenu('questionaries', 'submenu-questionaries');
   });
 });
