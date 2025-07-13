@@ -17,10 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Main menu: Questionaries
   const questionariesMenu = document.querySelector('.menu-title[data-menu="questionaries"]');
-  questionariesMenu.addEventListener('click', function (e) {
-    // Only toggle if clicking the menu itself, not a child
-    if (e.target === questionariesMenu || e.currentTarget === e.target) {
-      toggleSubmenu('questionaries', 'submenu-questionaries');
-    }
+  questionariesMenu.addEventListener('click', function () {
+    toggleSubmenu('questionaries', 'submenu-questionaries');
   });
 });
