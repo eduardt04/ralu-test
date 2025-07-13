@@ -44,34 +44,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Toggle chapters submenu on book click
     bookDiv.addEventListener('click', function (e) {
       e.stopPropagation(); // Prevent parent menu from toggling
-      console.log('Book clicked:', bookKey);
       const open = chaptersSubmenu.classList.contains('open');
-      document.querySelectorAll('.submenu').forEach((s, idx) => {
-        if (s.classList.contains('open')) {
-          console.log('Closing submenu:', s.id, idx);
-        }
-        s.classList.remove('open');
-      });
-      document.querySelectorAll('.caret').forEach((c, idx) => {
-        if (c.classList.contains('down')) {
-          console.log('Caret up:', idx);
-        }
-        c.classList.remove('down');
-      });
+      document.querySelectorAll('.submenu').forEach((s) => s.classList.remove('open'));
+      document.querySelectorAll('.caret').forEach((c) => c.classList.remove('down'));
       if (!open) {
         chaptersSubmenu.classList.add('open');
         bookDiv.querySelector('.caret').classList.add('down');
-        console.log('Opening submenu:', chaptersSubmenu.id, chaptersSubmenu, 'BookDiv:', bookDiv);
-      } else {
-        console.log('Submenu already open, closing:', chaptersSubmenu.id);
       }
-      // Print current DOM state
-      setTimeout(() => {
-        console.log('submenuQuestionaries innerHTML:', submenuQuestionaries.innerHTML);
-        document.querySelectorAll('.submenu').forEach((s, idx) => {
-          console.log('submenu', idx, s.id, 'open:', s.classList.contains('open'), s.style.display);
-        });
-      }, 100);
     });
   });
 
@@ -88,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!collection || !chapterId) return;
     // Load questions from Firestore
     mainContent.innerHTML = '<div>Loading questions...</div>';
-    console.log('Loading questions for:', collection, chapterId);
     try {
       const snapshot = await firebase.firestore()
         .collection(collection)
@@ -97,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .get();
       const allQuestions = [];
       snapshot.forEach(doc => allQuestions.push(doc.data()));
-      console.log('Questions loaded:', allQuestions.length, allQuestions);
       if (allQuestions.length === 0) {
         mainContent.innerHTML = '<div>No questions found for this chapter.</div>';
         return;
