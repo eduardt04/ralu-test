@@ -1,13 +1,11 @@
 import { chaptersData } from './chapters_id.js';
 
-// Book display names
 const bookNames = {
   kumar: 'Kumar',
   lawrence: 'Lawrence',
   sinopsis: 'Sinopsis'
 };
 
-// Firestore collection names
 const bookCollections = {
   kumar: 'kumar_questions',
   lawrence: 'lawrence_questions',
@@ -17,6 +15,7 @@ const bookCollections = {
 document.addEventListener('DOMContentLoaded', function () {
   const submenuQuestionaries = document.getElementById('submenu-questionaries');
   const mainContent = document.getElementById('main-content');
+  console.log('DOMContentLoaded: submenuQuestionaries:', submenuQuestionaries, 'mainContent:', mainContent);
 
   // Build book submenus
   Object.keys(chaptersData).forEach(bookKey => {
@@ -26,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     bookDiv.setAttribute('data-menu', bookKey);
     bookDiv.innerHTML = `<span>${bookNames[bookKey] || bookKey}</span><svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>`;
     submenuQuestionaries.appendChild(bookDiv);
+    console.log('Book menu created:', bookKey, bookDiv);
 
     // Chapters submenu
     const chaptersSubmenu = document.createElement('div');
@@ -38,35 +38,47 @@ document.addEventListener('DOMContentLoaded', function () {
       chapterDiv.setAttribute('data-chapter', chapterId);
       chapterDiv.textContent = chapterName;
       chaptersSubmenu.appendChild(chapterDiv);
+      console.log('Chapter menu created:', bookKey, chapterName, chapterId, chapterDiv);
     });
     submenuQuestionaries.appendChild(chaptersSubmenu);
+    console.log('Chapters submenu appended:', chaptersSubmenu);
 
     // Toggle chapters submenu on book click (minimal, robust)
     bookDiv.addEventListener('click', function (e) {
       e.stopPropagation();
+      console.log('Book clicked:', bookKey, 'event:', e, 'chaptersSubmenu:', chaptersSubmenu, 'bookDiv:', bookDiv);
       const open = chaptersSubmenu.classList.contains('open');
       if (open) {
         chaptersSubmenu.classList.remove('open');
         bookDiv.querySelector('.caret').classList.remove('down');
+        console.log('Closed chaptersSubmenu:', chaptersSubmenu.id);
       } else {
         chaptersSubmenu.classList.add('open');
         bookDiv.querySelector('.caret').classList.add('down');
+        console.log('Opened chaptersSubmenu:', chaptersSubmenu.id);
       }
+      setTimeout(() => {
+        console.log('AFTER BOOK CLICK: submenuQuestionaries.innerHTML:', submenuQuestionaries.innerHTML);
+        document.querySelectorAll('.submenu').forEach((s, idx) => {
+          console.log('submenu', idx, s.id, 'open:', s.classList.contains('open'), s.style.display);
+        });
+      }, 100);
     });
   });
 
-  // Handle chapter click: load questions from Firestore
   submenuQuestionaries.addEventListener('click', async function (e) {
     const chapterDiv = e.target.closest('.submenu-title[data-book]');
-    if (!chapterDiv) return;
-    // Set active state for submenu items
+    if (!chapterDiv) {
+      console.log('No chapterDiv found for click:', e.target);
+      return;
+    }
     document.querySelectorAll('.submenu-title').forEach(i => i.classList.remove('active'));
     chapterDiv.classList.add('active');
     const bookKey = chapterDiv.getAttribute('data-book');
     const chapterId = chapterDiv.getAttribute('data-chapter');
     const collection = bookCollections[bookKey];
+    console.log('Chapter clicked:', chapterDiv, 'bookKey:', bookKey, 'chapterId:', chapterId, 'collection:', collection);
     if (!collection || !chapterId) return;
-    // Load questions from Firestore
     mainContent.innerHTML = '<div>Loading questions...</div>';
     try {
       const snapshot = await firebase.firestore()
@@ -76,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .get();
       const allQuestions = [];
       snapshot.forEach(doc => allQuestions.push(doc.data()));
+      console.log('Questions loaded:', allQuestions.length, allQuestions);
       if (allQuestions.length === 0) {
         mainContent.innerHTML = '<div>No questions found for this chapter.</div>';
         return;
@@ -113,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         document.getElementById('answerForm').onsubmit = function(e) {
           e.preventDefault();
-          // Answer logic can be added here
         };
       }
       renderQuestion(currentIndex);
