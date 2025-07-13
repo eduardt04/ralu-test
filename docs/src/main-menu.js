@@ -1,4 +1,3 @@
-console.log('main-menu.js loaded');
 window.onerror = function(msg, url, line, col, error) {
   console.error('GLOBAL ERROR:', msg, url, line, col, error);
 };
@@ -24,11 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const submenuQuestionaries = document.getElementById('submenu-questionaries');
   const mainContent = document.getElementById('main-content');
   const questionariesMenuTitle = document.querySelector('.menu-title[data-menu="questionaries"]');
-  console.log('DOMContentLoaded: submenuQuestionaries:', submenuQuestionaries, 'mainContent:', mainContent, 'questionariesMenuTitle:', questionariesMenuTitle);
 
   // Toggle the main Questionaries submenu
   questionariesMenuTitle.addEventListener('click', function(e) {
-    console.log('DEBUG: Questionaries menu title clicked', e);
     e.stopPropagation();
     const open = submenuQuestionaries.classList.contains('open');
     document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
@@ -36,9 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!open) {
       submenuQuestionaries.classList.add('open');
       questionariesMenuTitle.querySelector('.caret').classList.add('down');
-      console.log('DEBUG: Opened main Questionaries submenu');
-    } else {
-      console.log('DEBUG: Closed main Questionaries submenu');
     }
   });
 
@@ -68,80 +62,54 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Use event delegation for all clicks in the sidebar
   submenuQuestionaries.addEventListener('click', async function (e) {
-    console.log('DEBUG: sidebar click event fired', e);
     const bookDiv = e.target.closest('.book-menu');
-    console.log('DEBUG: after bookDiv closest', bookDiv);
     if (bookDiv) {
-      console.log('DEBUG: inside bookDiv if');
       e.stopPropagation();
-      console.log('DEBUG: after stopPropagation');
       const bookKey = bookDiv.getAttribute('data-menu');
-      console.log('DEBUG: bookKey', bookKey);
       const chaptersSubmenu = document.getElementById(`submenu-${bookKey}`);
-      console.log('DEBUG: chaptersSubmenu', chaptersSubmenu);
       const open = chaptersSubmenu.classList.contains('open');
-      console.log('DEBUG: open', open);
       // Only close other book submenus, not the main questionaries submenu
       submenuQuestionaries.querySelectorAll('.submenu').forEach((s, i) => {
         if (s !== chaptersSubmenu) {
           s.classList.remove('open');
-          console.log('DEBUG: removed open from submenu', i, s);
         }
       });
       submenuQuestionaries.querySelectorAll('.book-menu .caret').forEach((c, i) => {
         if (bookDiv.querySelector('.caret') !== c) {
           c.classList.remove('down');
-          console.log('DEBUG: removed down from caret', i, c);
         }
       });
       if (!open) {
         chaptersSubmenu.classList.add('open');
-        console.log('DEBUG: added open to chaptersSubmenu');
         bookDiv.querySelector('.caret').classList.add('down');
-        console.log('DEBUG: added down to caret');
-        console.log('DEBUG: Opened chaptersSubmenu:', chaptersSubmenu.id);
-      } else {
-        console.log('DEBUG: Closed chaptersSubmenu:', chaptersSubmenu.id);
       }
       return;
     }
     const chapterDiv = e.target.closest('.chapter-menu');
-    console.log('DEBUG: after chapterDiv closest', chapterDiv);
     if (chapterDiv) {
-      console.log('DEBUG: inside chapterDiv if');
-      document.querySelectorAll('.submenu-title').forEach((i, idx) => { i.classList.remove('active'); console.log('DEBUG: removed active from', idx, i); });
+      document.querySelectorAll('.submenu-title').forEach((i, idx) => { i.classList.remove('active'); });
       chapterDiv.classList.add('active');
-      console.log('DEBUG: added active to chapterDiv');
       const bookKey = chapterDiv.getAttribute('data-book');
-      console.log('DEBUG: bookKey', bookKey);
       const chapterId = chapterDiv.getAttribute('data-chapter');
-      console.log('DEBUG: chapterId', chapterId);
       const collection = bookCollections[bookKey];
-      console.log('DEBUG: collection', collection);
-      if (!collection || !chapterId) { console.log('DEBUG: missing collection or chapterId, returning'); return; }
+      if (!collection || !chapterId) { return; }
       mainContent.innerHTML = '<div>Loading questions...</div>';
-      console.log('DEBUG: set mainContent to loading');
       try {
         const snapshot = await firebase.firestore()
           .collection(collection)
           .doc(chapterId)
           .collection('questions')
           .get();
-        console.log('DEBUG: got snapshot', snapshot);
         const allQuestions = [];
-        snapshot.forEach(doc => { allQuestions.push(doc.data()); console.log('DEBUG: pushed doc', doc.data()); });
-        console.log('DEBUG: allQuestions', allQuestions);
+        snapshot.forEach(doc => { allQuestions.push(doc.data()); });
         if (allQuestions.length === 0) {
           mainContent.innerHTML = '<div>No questions found for this chapter.</div>';
-          console.log('DEBUG: no questions found');
           return;
         }
         let currentIndex = 0;
         function renderQuestion(idx) {
-          console.log('DEBUG: renderQuestion', idx);
           const q = allQuestions[idx];
-          console.log('DEBUG: question', q);
-          if (!q) { console.log('DEBUG: no question at idx', idx); return; }
+          if (!q) { return; }
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
@@ -163,22 +131,17 @@ document.addEventListener('DOMContentLoaded', function () {
               </div>
             </div>
           `;
-          console.log('DEBUG: rendered question HTML');
           document.getElementById('prevQ').onclick = function() {
-            console.log('DEBUG: prevQ clicked');
             if (currentIndex > 0) { currentIndex--; renderQuestion(currentIndex); }
           };
           document.getElementById('nextQ').onclick = function() {
-            console.log('DEBUG: nextQ clicked');
             if (currentIndex < allQuestions.length - 1) { currentIndex++; renderQuestion(currentIndex); }
           };
           document.getElementById('answerForm').onsubmit = function(e) {
             e.preventDefault();
-            console.log('DEBUG: answerForm submitted');
           };
         }
         renderQuestion(currentIndex);
-        console.log('DEBUG: called renderQuestion');
       } catch (err) {
         mainContent.innerHTML = '<div style="color:red">Error loading questions. See console for details.</div>';
         console.error('DEBUG: Error loading questions:', err);
@@ -186,10 +149,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
     // fallback debug
-    console.log('DEBUG: Sidebar click, but not on book or chapter:', e.target);
   });
 
   document.addEventListener('click', function(e) {
-    console.log('DEBUG: document click', e.target);
   });
 });
