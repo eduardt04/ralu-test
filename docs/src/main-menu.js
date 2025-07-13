@@ -23,7 +23,24 @@ const bookCollections = {
 document.addEventListener('DOMContentLoaded', function () {
   const submenuQuestionaries = document.getElementById('submenu-questionaries');
   const mainContent = document.getElementById('main-content');
-  console.log('DOMContentLoaded: submenuQuestionaries:', submenuQuestionaries, 'mainContent:', mainContent);
+  const questionariesMenuTitle = document.querySelector('.menu-title[data-menu="questionaries"]');
+  console.log('DOMContentLoaded: submenuQuestionaries:', submenuQuestionaries, 'mainContent:', mainContent, 'questionariesMenuTitle:', questionariesMenuTitle);
+
+  // Toggle the main Questionaries submenu
+  questionariesMenuTitle.addEventListener('click', function(e) {
+    console.log('DEBUG: Questionaries menu title clicked', e);
+    e.stopPropagation();
+    const open = submenuQuestionaries.classList.contains('open');
+    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+    document.querySelectorAll('.caret').forEach(c => c.classList.remove('down'));
+    if (!open) {
+      submenuQuestionaries.classList.add('open');
+      questionariesMenuTitle.querySelector('.caret').classList.add('down');
+      console.log('DEBUG: Opened main Questionaries submenu');
+    } else {
+      console.log('DEBUG: Closed main Questionaries submenu');
+    }
+  });
 
   // Build book submenus
   Object.keys(chaptersData).forEach(bookKey => {
