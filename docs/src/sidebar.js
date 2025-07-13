@@ -15,5 +15,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // No Questionaries menu click handler here; handled in main-menu.js
+  // Main menu: Questionaries
+  const questionariesMenu = document.querySelector('.menu-title[data-menu="questionaries"]');
+  questionariesMenu.addEventListener('click', function (e) {
+    // Only toggle if clicking the menu itself, not a child
+    if (e.target === questionariesMenu || e.currentTarget === e.target) {
+      toggleSubmenu('questionaries', 'submenu-questionaries');
+    }
+  });
 });

@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Toggle chapters submenu on book click
     bookDiv.addEventListener('click', function (e) {
-      e.stopPropagation();
+      e.stopPropagation(); // Prevent parent menu from toggling
       console.log('Book clicked:', bookKey);
       const open = chaptersSubmenu.classList.contains('open');
       document.querySelectorAll('.submenu').forEach((s, idx) => {
@@ -143,20 +143,5 @@ document.addEventListener('DOMContentLoaded', function () {
       mainContent.innerHTML = '<div style="color:red">Error loading questions. See console for details.</div>';
       console.error('Error loading questions:', err);
     }
-  });
-
-  // Add Questionaries menu click handler after submenu is created
-  const questionariesMenu = document.querySelector('.menu-title[data-menu="questionaries"]');
-  questionariesMenu.addEventListener('click', function () {
-    const submenu = document.getElementById('submenu-questionaries');
-    const caret = questionariesMenu.querySelector('.caret');
-    if (submenu.classList.contains('open')) {
-      submenu.classList.remove('open');
-      if (caret) caret.classList.remove('down');
-    } else {
-      submenu.classList.add('open');
-      if (caret) caret.classList.add('down');
-    }
-    console.log('Questionaries menu toggled in main-menu.js');
   });
 });
