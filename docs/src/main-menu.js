@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', function () {
   submenuQuestionaries.addEventListener('click', async function (e) {
     const chapterDiv = e.target.closest('.submenu-title[data-book]');
     if (!chapterDiv) return;
+    // Set active state for submenu items
+    document.querySelectorAll('.submenu-title').forEach(i => i.classList.remove('active'));
+    chapterDiv.classList.add('active');
     const bookKey = chapterDiv.getAttribute('data-book');
     const chapterId = chapterDiv.getAttribute('data-chapter');
     const collection = bookCollections[bookKey];

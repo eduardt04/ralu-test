@@ -20,17 +20,4 @@ document.addEventListener('DOMContentLoaded', function () {
   questionariesMenu.addEventListener('click', function () {
     toggleSubmenu('questionaries', 'submenu-questionaries');
   });
-
-  // Open the submenu by default for testing (optional, remove if not needed)
-  // document.getElementById('submenu-questionaries').classList.add('open');
-
-  // Optionally, you can add active state logic for submenu items
-  const submenuTitles = document.querySelectorAll('.submenu-title');
-  submenuTitles.forEach(function (item) {
-    item.addEventListener('click', function (e) {
-      // Remove active from all
-      submenuTitles.forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-    });
-  });
 });
