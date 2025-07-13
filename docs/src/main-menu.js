@@ -160,4 +160,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // fallback debug
     console.log('DEBUG: Sidebar click, but not on book or chapter:', e.target);
   });
+
+  document.addEventListener('click', function(e) {
+    console.log('DEBUG: document click', e.target);
+  });
 });
