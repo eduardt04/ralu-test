@@ -41,13 +41,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     submenuQuestionaries.appendChild(chaptersSubmenu);
 
-    // Toggle chapters submenu on book click
+    // Toggle chapters submenu on book click (minimal, robust)
     bookDiv.addEventListener('click', function (e) {
-      e.stopPropagation(); // Prevent parent menu from toggling
+      e.stopPropagation();
       const open = chaptersSubmenu.classList.contains('open');
-      document.querySelectorAll('.submenu').forEach((s) => s.classList.remove('open'));
-      document.querySelectorAll('.caret').forEach((c) => c.classList.remove('down'));
-      if (!open) {
+      if (open) {
+        chaptersSubmenu.classList.remove('open');
+        bookDiv.querySelector('.caret').classList.remove('down');
+      } else {
         chaptersSubmenu.classList.add('open');
         bookDiv.querySelector('.caret').classList.add('down');
       }
