@@ -110,11 +110,10 @@ document.addEventListener('DOMContentLoaded', function () {
         function renderQuestion(idx) {
           const q = allQuestions[idx];
           if (!q) { return; }
-          // Determine if the question allows multiple answers
-          const isMultiple = Array.isArray(q["Răspuns corect multiplu"]) && q["Răspuns corect multiplu"].length > 0;
-          // Get correct answers as array
-          const correctAnswers = isMultiple ? (q["Răspuns corect multiplu"] || []) : [q["Răspuns corect"]];
-          let feedbackHTML = '';
+          // Use 'Răspunsuri' array for correct answers, normalize for comparison
+          const normalize = v => String(v).trim().toLowerCase();
+          const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
+          const isMultiple = correctAnswers.length > 1;
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
@@ -123,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="options">
                   ${(q.Variante || []).map(opt => `
                     <label class="option-label">
-                      <input type="${isMultiple ? 'checkbox' : 'radio'}" name="option${isMultiple ? '[]' : ''}" value="${opt}" ${isMultiple ? '' : 'required'} />
+                      <input type="${isMultiple ? 'checkbox' : 'radio'}" name="option${isMultiple ? '[]' : ''}" value="${normalize(opt)}" ${isMultiple ? '' : 'required'} />
                       <span>${opt}</span>
                     </label>
                   `).join('')}
@@ -145,14 +144,13 @@ document.addEventListener('DOMContentLoaded', function () {
           };
           document.getElementById('answerForm').onsubmit = function(e) {
             e.preventDefault();
-            const selected = Array.from(document.querySelectorAll('.option-label input:checked')).map(i => i.value);
-            const correctSet = new Set(correctAnswers.map(String));
-            const selectedSet = new Set(selected.map(String));
-            let allCorrect = selected.length === correctAnswers.length && selected.every(val => correctSet.has(val));
+            const selected = Array.from(document.querySelectorAll('.option-label input:checked')).map(i => normalize(i.value));
+            const correctSet = new Set(correctAnswers);
+            const selectedSet = new Set(selected);
             // Color feedback
             document.querySelectorAll('.option-label').forEach(label => {
               const input = label.querySelector('input');
-              const val = input.value;
+              const val = normalize(input.value);
               if (correctSet.has(val)) {
                 label.style.background = '#c6f7d0'; // green
               }
