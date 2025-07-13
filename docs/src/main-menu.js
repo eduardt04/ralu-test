@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
     bookDiv.setAttribute('data-menu', bookKey);
     bookDiv.innerHTML = `<span>${bookNames[bookKey] || bookKey}</span><svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>`;
     submenuQuestionaries.appendChild(bookDiv);
-    console.log('Book menu created:', bookKey);
 
     // Chapters submenu
     const chaptersSubmenu = document.createElement('div');
@@ -39,21 +38,40 @@ document.addEventListener('DOMContentLoaded', function () {
       chapterDiv.setAttribute('data-chapter', chapterId);
       chapterDiv.textContent = chapterName;
       chaptersSubmenu.appendChild(chapterDiv);
-      console.log('Chapter menu created:', bookKey, chapterName, chapterId);
     });
     submenuQuestionaries.appendChild(chaptersSubmenu);
 
     // Toggle chapters submenu on book click
     bookDiv.addEventListener('click', function (e) {
       e.stopPropagation();
+      console.log('Book clicked:', bookKey);
       const open = chaptersSubmenu.classList.contains('open');
-      document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
-      document.querySelectorAll('.caret').forEach(c => c.classList.remove('down'));
+      document.querySelectorAll('.submenu').forEach((s, idx) => {
+        if (s.classList.contains('open')) {
+          console.log('Closing submenu:', s.id, idx);
+        }
+        s.classList.remove('open');
+      });
+      document.querySelectorAll('.caret').forEach((c, idx) => {
+        if (c.classList.contains('down')) {
+          console.log('Caret up:', idx);
+        }
+        c.classList.remove('down');
+      });
       if (!open) {
         chaptersSubmenu.classList.add('open');
         bookDiv.querySelector('.caret').classList.add('down');
+        console.log('Opening submenu:', chaptersSubmenu.id, chaptersSubmenu, 'BookDiv:', bookDiv);
+      } else {
+        console.log('Submenu already open, closing:', chaptersSubmenu.id);
       }
-      console.log('Book submenu toggled:', bookKey, 'open:', !open);
+      // Print current DOM state
+      setTimeout(() => {
+        console.log('submenuQuestionaries innerHTML:', submenuQuestionaries.innerHTML);
+        document.querySelectorAll('.submenu').forEach((s, idx) => {
+          console.log('submenu', idx, s.id, 'open:', s.classList.contains('open'), s.style.display);
+        });
+      }, 100);
     });
   });
 
