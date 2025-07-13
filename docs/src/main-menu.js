@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const q = allQuestions[idx];
           if (!q) { return; }
           // Determine if the question allows multiple answers
-          const isMultiple = Array.isArray(q["Răspuns corect multiplu"]) && q["Răspuns corect multiplu"].length > 1;
+          const isMultiple = Array.isArray(q["Răspuns corect multiplu"]) && q["Răspuns corect multiplu"].length > 0;
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="options">
                   ${(q.Variante || []).map(opt => `
                     <label class="option-label">
-                      <input type="${isMultiple ? 'checkbox' : 'radio'}" name="option" value="${opt}" ${isMultiple ? '' : 'required'} />
+                      <input type="${isMultiple ? 'checkbox' : 'radio'}" name="option${isMultiple ? '[]' : ''}" value="${opt}" ${isMultiple ? '' : 'required'} />
                       <span>${opt}</span>
                     </label>
                   `).join('')}
