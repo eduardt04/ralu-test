@@ -112,6 +112,9 @@ document.addEventListener('DOMContentLoaded', function () {
           if (!q) { return; }
           // Determine if the question allows multiple answers
           const isMultiple = Array.isArray(q["Răspuns corect multiplu"]) && q["Răspuns corect multiplu"].length > 0;
+          // Get correct answers as array
+          const correctAnswers = isMultiple ? (q["Răspuns corect multiplu"] || []) : [q["Răspuns corect"]];
+          let feedbackHTML = '';
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
@@ -127,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <button type="submit" class="question-btn">Răspunde</button>
               </form>
+              <div id="feedback"></div>
               <div class="question-nav">
                 <button id="prevQ" class="question-btn" ${idx === 0 ? 'disabled' : ''}>Întrebarea anterioară</button>
                 <button id="nextQ" class="question-btn" ${idx === allQuestions.length - 1 ? 'disabled' : ''}>Întrebarea următoare</button>
@@ -141,6 +145,27 @@ document.addEventListener('DOMContentLoaded', function () {
           };
           document.getElementById('answerForm').onsubmit = function(e) {
             e.preventDefault();
+            const selected = Array.from(document.querySelectorAll('.option-label input:checked')).map(i => i.value);
+            const correctSet = new Set(correctAnswers.map(String));
+            const selectedSet = new Set(selected.map(String));
+            let allCorrect = selected.length === correctAnswers.length && selected.every(val => correctSet.has(val));
+            // Color feedback
+            document.querySelectorAll('.option-label').forEach(label => {
+              const input = label.querySelector('input');
+              const val = input.value;
+              if (correctSet.has(val)) {
+                label.style.background = '#c6f7d0'; // green
+              }
+              if (selectedSet.has(val) && !correctSet.has(val)) {
+                label.style.background = '#ffd6d6'; // red
+              }
+            });
+            // Show Sursa
+            const sursa = q['Sursa'] ? `<div class="sursa" style="margin:1.2rem 0 0.5rem 0; color:#444; background:#f4f4f4; border-radius:8px; padding:0.8rem 1rem; font-size:1rem;"><b>Sursa:</b> ${q['Sursa']}</div>` : '';
+            document.getElementById('feedback').innerHTML = sursa;
+            // Disable further changes
+            document.querySelectorAll('.option-label input').forEach(i => i.disabled = true);
+            document.querySelector('.question-btn[type="submit"]').disabled = true;
           };
         }
         renderQuestion(currentIndex);
