@@ -81,8 +81,19 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('DEBUG: chaptersSubmenu', chaptersSubmenu);
       const open = chaptersSubmenu.classList.contains('open');
       console.log('DEBUG: open', open);
-      document.querySelectorAll('.submenu').forEach((s, i) => { s.classList.remove('open'); console.log('DEBUG: removed open from submenu', i, s); });
-      document.querySelectorAll('.caret').forEach((c, i) => { c.classList.remove('down'); console.log('DEBUG: removed down from caret', i, c); });
+      // Only close other book submenus, not the main questionaries submenu
+      submenuQuestionaries.querySelectorAll('.submenu').forEach((s, i) => {
+        if (s !== chaptersSubmenu) {
+          s.classList.remove('open');
+          console.log('DEBUG: removed open from submenu', i, s);
+        }
+      });
+      submenuQuestionaries.querySelectorAll('.book-menu .caret').forEach((c, i) => {
+        if (bookDiv.querySelector('.caret') !== c) {
+          c.classList.remove('down');
+          console.log('DEBUG: removed down from caret', i, c);
+        }
+      });
       if (!open) {
         chaptersSubmenu.classList.add('open');
         console.log('DEBUG: added open to chaptersSubmenu');
