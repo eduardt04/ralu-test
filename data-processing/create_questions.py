@@ -8,6 +8,8 @@ DATA_DIR = PROJECT_ROOT + "data/"
 CHAPTERS_FILEPATH = DATA_DIR + "chapters.json"
 CHAPTERS_ID_PATH = DATA_DIR + "chapters_id.json"
 
+openai.api_key = open(API_KEY_PATH).read()
+
 def read_chapters(query_book, query_chapter):
     chapters_id = json.load(open(CHAPTERS_ID_PATH, "r"))
     data_path = f"{DATA_DIR}{query_book}/{chapters_id[query_book][query_chapter]}/*.txt"
@@ -118,8 +120,8 @@ Indicații pentru crearea grilelor:
 - Include cel puțin o întrebare cu enunț tip negativ („Identificați afirmația falsă”, etc.).
 """
 
-    cost_estimate = estimate_prompt_cost(prompt_text, model=model)
-    print("Cost estimate: ", cost_estimate)
+    # cost_estimate = estimate_prompt_cost(prompt_text, model=model)
+    # print("Cost estimate: ", cost_estimate)
 
     response = openai.chat.completions.create(
         model=model,
@@ -140,20 +142,26 @@ Indicații pentru crearea grilelor:
 
 
 if __name__ == "__main__":
-    for query_book in ["kumar"]:
-        for query_chapter in ["DIABETUL ZAHARAT", "SEPSISUL ȘI TRATAMENTUL INFECȚIILOR BACTERIENE", "ENDOCRINOLOGIE"]:
+    chapters_id = json.load(open(CHAPTERS_ID_PATH, "r"))
+
+    for query_book in ["kumar", "lawrence", "sinopsis"]:
+        for query_chapter in list(chapters_id[query_book].keys()):
             chapter_pages = read_chapters(query_book, query_chapter)
 
-            print(query_chapter)
-            for i in range(1, 3):
-                print(f"Page {i}")
-                qa = query_llm_with_chapter(chapter_pages[i])
-
-                chapters_id = json.load(open(CHAPTERS_ID_PATH, "r"))
+            for i in range(1, len(chapter_pages)):
+                print(f"Processing {query_book}: {query_chapter} - {i}")
                 save_path = f"{DATA_DIR}{query_book}/questions/{chapters_id[query_book][query_chapter]}/"
-
+                
                 if not os.path.exists(save_path):
                     os.mkdir(save_path)
                 
+                if os.path.exists(f"{save_path}/{i}.txt"):
+                    print(f"File {save_path}/{i}.txt already exists, skipping.")
+                    continue
+
+                qa = query_llm_with_chapter(chapter_pages[i])
+
                 with open(f"{save_path}/{i}.txt", "w", encoding="utf-8") as f:
                     f.write(qa)
+
+                print(f"Saved to {save_path}/{i}.txt")

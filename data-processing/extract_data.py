@@ -86,7 +86,7 @@ Dacă există orice fel de text pe pagină (oricât de mic, izolat sau în figur
                 ]
             }
         ],
-        temperature=0.7
+        temperature=0.4
     )
     return response.choices[0].message.content
 
@@ -115,7 +115,7 @@ def process_pdf(query_book, query_chapter):
     if not os.path.exists(save_folder_path):
         os.mkdir(save_folder_path)
     
-    pages = convert_from_path(pdf_path, dpi=150)
+    pages = convert_from_path(pdf_path, dpi=200)
     total_pages += len(pages)
     for i, page in enumerate(pages):
         page_save_path = save_folder_path + f"page_{i+1}.txt"
@@ -125,7 +125,7 @@ def process_pdf(query_book, query_chapter):
         else:
             print(f"Process page {i+1} / {len(pages)}")
             result = query_llm_with_image(page, i+1)
-            if len(result) < 200 or result.count("\n") == 0:
+            if len(result) < 100 or result.count("\n") == 0:
                 print(f"Process page {i+1} failed.")
                 print(result)
             else:
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     chapters = json.load(open(CHAPTERS_FILEPATH, "r"))
     chapters_id = json.load(open(CHAPTERS_ID_PATH, "r"))
 
-    for query_book in ["kumar"]:
+    for query_book in ["lawrence", "sinopsis"]:
         for query_chapter in list(chapters_id[query_book]):
             print(f"Start working on {query_book}: {query_chapter}")
             process_pdf(query_book, query_chapter)
