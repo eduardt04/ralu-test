@@ -144,4 +144,19 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Error loading questions:', err);
     }
   });
+
+  // Add Questionaries menu click handler after submenu is created
+  const questionariesMenu = document.querySelector('.menu-title[data-menu="questionaries"]');
+  questionariesMenu.addEventListener('click', function () {
+    const submenu = document.getElementById('submenu-questionaries');
+    const caret = questionariesMenu.querySelector('.caret');
+    if (submenu.classList.contains('open')) {
+      submenu.classList.remove('open');
+      if (caret) caret.classList.remove('down');
+    } else {
+      submenu.classList.add('open');
+      if (caret) caret.classList.add('down');
+    }
+    console.log('Questionaries menu toggled in main-menu.js');
+  });
 });
