@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
     bookDiv.setAttribute('data-menu', bookKey);
     bookDiv.innerHTML = `<span>${bookNames[bookKey] || bookKey}</span><svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>`;
     submenuQuestionaries.appendChild(bookDiv);
-    console.log('Book menu created:', bookKey, bookDiv);
 
     // Chapters submenu
     const chaptersSubmenu = document.createElement('div');
@@ -46,10 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
       chapterDiv.setAttribute('data-chapter', chapterId);
       chapterDiv.textContent = chapterName;
       chaptersSubmenu.appendChild(chapterDiv);
-      console.log('Chapter menu created:', bookKey, chapterName, chapterId, chapterDiv);
     });
     submenuQuestionaries.appendChild(chaptersSubmenu);
-    console.log('Chapters submenu appended:', chaptersSubmenu);
   });
 
   // Use event delegation for all clicks in the sidebar
