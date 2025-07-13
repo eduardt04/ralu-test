@@ -1,3 +1,11 @@
+console.log('main-menu.js loaded');
+window.onerror = function(msg, url, line, col, error) {
+  console.error('GLOBAL ERROR:', msg, url, line, col, error);
+};
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('UNHANDLED PROMISE REJECTION:', event.reason);
+});
+
 import { chaptersData } from './chapters_id.js';
 
 const bookNames = {
