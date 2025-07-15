@@ -158,9 +158,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 label.style.background = '#ffd6d6'; // red
               }
             });
-            // Show Sursa
-            const sursa = q['Sursa'] ? `<div class="sursa" style="margin:1.2rem 0 0.5rem 0; color:#444; background:#f4f4f4; border-radius:8px; padding:0.8rem 1rem; font-size:1rem;"><b>Sursa:</b> ${q['Sursa']}</div>` : '';
-            document.getElementById('feedback').innerHTML = sursa;
+            // Show Pagina and Sursa
+            let pagina = '';
+            if (q['partition']) {
+              const match = q['partition'].match(/(\d+)/);
+              if (match) pagina = match[1];
+            } else if (q['pagina']) {
+              pagina = q['pagina'];
+            }
+            let paginaHtml = pagina ? `<div class=\"pagina\" style=\"margin:1.2rem 0 0.2rem 0; color:#444; background:#f4f4f4; border-radius:8px; padding:0.6rem 1rem; font-size:1rem;\"><b>Pagina:</b> ${pagina}</div>` : '';
+            const sursa = q['Sursa'] ? `<div class=\"sursa\" style=\"margin:0.2rem 0 0.5rem 0; color:#444; background:#f4f4f4; border-radius:8px; padding:0.8rem 1rem; font-size:1rem;\"><b>Sursa:</b> ${q['Sursa']}</div>` : '';
+            document.getElementById('feedback').innerHTML = paginaHtml + sursa;
             // Disable further changes
             document.querySelectorAll('.option-label input').forEach(i => i.disabled = true);
             document.querySelector('.question-btn[type="submit"]').disabled = true;
