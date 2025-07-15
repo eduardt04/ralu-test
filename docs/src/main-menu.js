@@ -121,24 +121,58 @@ document.addEventListener('DOMContentLoaded', function () {
           mainContent.innerHTML = '<div>No questions found for this chapter.</div>';
           return;
         }
+        // Sort questions by numeric page and question number
+        allQuestions.sort((a, b) => {
+          // Get numeric page/partition
+          const getPage = q => {
+            if (q.pagina) return parseInt(q.pagina, 10);
+            if (q.partition) {
+              const m = String(q.partition).match(/^(\d+)/);
+              if (m) return parseInt(m[1], 10);
+            }
+            return 0;
+          };
+          // Get numeric question number from doc id if possible
+          const getQNum = q => {
+            if (q.id) {
+              const m = String(q.id).match(/^\d+_(\d+)/);
+              if (m) return parseInt(m[1], 10);
+            }
+            if (q["Numar întrebare"] || q["Numar_intrebare"]) {
+              return parseInt(q["Numar întrebare"] || q["Numar_intrebare"], 10);
+            }
+            return 0;
+          };
+          const pageA = getPage(a), pageB = getPage(b);
+          if (pageA !== pageB) return pageA - pageB;
+          const qA = getQNum(a), qB = getQNum(b);
+          return qA - qB;
+        });
         let currentIndex = 0;
         function renderQuestion(idx) {
           const q = allQuestions[idx];
           if (!q) { return; }
-          // Use 'Răspunsuri' array for correct answers, normalize for comparison
-          const normalize = v => String(v).trim().toLowerCase();
+          // Use 'Răspunsuri' array for correct answers, normalize for comparison, and strip letters
+          const normalize = v => stripLetter(String(v)).trim().toLowerCase();
           const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
           const isMultiple = correctAnswers.length > 1;
           // Remove leading number and dot from the question text
           let questionText = q["Întrebare răspuns simplu"] || q["Întrebare răspuns multiplu"] || '';
           questionText = questionText.replace(/^\s*\d+\.?\s*/, '');
+          // Prepare and shuffle options, stripping letters
+          let options = (q.Variante || []).map(stripLetter);
+          // Shuffle options
+          for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+          }
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
               <div class="question-text">${questionText}</div>
               <form id="answerForm">
                 <div class="options">
-                  ${(q.Variante || []).map(opt => `
+                  ${options.map(opt => `
                     <label class="option-label">
                       <input type="${isMultiple ? 'checkbox' : 'radio'}" name="option${isMultiple ? '[]' : ''}" value="${normalize(opt)}" ${isMultiple ? '' : 'required'} />
                       <span>${opt}</span>
