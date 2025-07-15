@@ -129,10 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
           const normalize = v => String(v).trim().toLowerCase();
           const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
           const isMultiple = correctAnswers.length > 1;
+          // Remove leading number and dot from the question text
+          let questionText = q["Întrebare răspuns simplu"] || q["Întrebare răspuns multiplu"] || '';
+          questionText = questionText.replace(/^\s*\d+\.?\s*/, '');
           mainContent.innerHTML = `
             <div class="questionnaire">
               <div class="question-number">Întrebarea ${idx + 1} din ${allQuestions.length}</div>
-              <div class="question-text">${q["Întrebare răspuns simplu"] || q["Întrebare răspuns multiplu"] || ''}</div>
+              <div class="question-text">${questionText}</div>
               <form id="answerForm">
                 <div class="options">
                   ${(q.Variante || []).map(opt => `
