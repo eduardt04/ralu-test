@@ -105,11 +105,15 @@ document.addEventListener('DOMContentLoaded', function () {
           const data = doc.data();
           // Attach partition from doc.ref.path if not present
           if (!data.partition && doc.ref && doc.ref.parent && doc.ref.parent.parent) {
-            // Try to extract partition from path like .../questions/10_2/...
             const parentId = doc.ref.parent.id;
             if (/\d+_\d+/.test(parentId)) {
               data.partition = parentId;
             }
+          }
+          // Extract page number from question doc ID (e.g., '1' from '1_1')
+          if (!data.pagina && doc.id) {
+            const match = doc.id.match(/^(\d+)_/);
+            if (match) data.pagina = match[1];
           }
           allQuestions.push(data);
         });
