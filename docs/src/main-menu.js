@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
       e.stopPropagation();
       const bookKey = bookDiv.getAttribute('data-menu');
       const chaptersSubmenu = document.getElementById(`submenu-${bookKey}`);
+      const caret = bookDiv.querySelector('.caret');
       const open = chaptersSubmenu.classList.contains('open');
       // Only close other book submenus, not the main questionaries submenu
       submenuQuestionaries.querySelectorAll('.submenu').forEach((s, i) => {
@@ -75,13 +76,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
       submenuQuestionaries.querySelectorAll('.book-menu .caret').forEach((c, i) => {
-        if (bookDiv.querySelector('.caret') !== c) {
+        if (caret !== c) {
           c.classList.remove('down');
         }
       });
-      if (!open) {
+      // Toggle the clicked book submenu
+      if (open) {
+        chaptersSubmenu.classList.remove('open');
+        caret.classList.remove('down');
+      } else {
         chaptersSubmenu.classList.add('open');
-        bookDiv.querySelector('.caret').classList.add('down');
+        caret.classList.add('down');
       }
       return;
     }
