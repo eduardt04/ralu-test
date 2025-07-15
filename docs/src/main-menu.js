@@ -122,6 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
         // Sort questions by numeric page and question number
+        // Helper to remove leading letter and dot (e.g., 'A. ', 'B. ', etc.)
+        const stripLetter = s => String(s).replace(/^\s*[A-Ea-e]\.?\s+/, '').trim();
+        // Sort questions by numeric page and question number
         allQuestions.sort((a, b) => {
           // Get numeric page/partition
           const getPage = q => {
