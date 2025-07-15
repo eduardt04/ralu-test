@@ -101,7 +101,18 @@ document.addEventListener('DOMContentLoaded', function () {
           .collection('questions')
           .get();
         const allQuestions = [];
-        snapshot.forEach(doc => { allQuestions.push(doc.data()); });
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          // Attach partition from doc.ref.path if not present
+          if (!data.partition && doc.ref && doc.ref.parent && doc.ref.parent.parent) {
+            // Try to extract partition from path like .../questions/10_2/...
+            const parentId = doc.ref.parent.id;
+            if (/\d+_\d+/.test(parentId)) {
+              data.partition = parentId;
+            }
+          }
+          allQuestions.push(data);
+        });
         if (allQuestions.length === 0) {
           mainContent.innerHTML = '<div>No questions found for this chapter.</div>';
           return;
