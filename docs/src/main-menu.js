@@ -172,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Show Pagina and Sursa
             let pagina = '';
             if (q['partition']) {
-              // Extract the first number (e.g., '10' from '10_2')
               const match = q['partition'].match(/^(\d+)/);
               if (match) pagina = match[1];
             } else if (q['pagina']) {
@@ -180,7 +179,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             let paginaHtml = pagina ? `<div class="pagina" style="margin:1.2rem 0 0.2rem 0; color:#444; background:#f4f4f4; border-radius:8px; padding:0.6rem 1rem; font-size:1rem;"><b>Pagina:</b> ${pagina}</div>` : '';
             const sursa = q['Sursa'] ? `<div class="sursa" style="margin:0.2rem 0 0.5rem 0; color:#444; background:#f4f4f4; border-radius:8px; padding:0.8rem 1rem; font-size:1rem;"><b>Sursa:</b> ${q['Sursa']}</div>` : '';
-            document.getElementById('feedback').innerHTML = paginaHtml + sursa;
+            // Debug: show all fields if pagina is missing
+            let debugHtml = '';
+            if (!pagina) {
+              debugHtml = `<pre style='background:#fee;color:#a00;padding:0.5rem 1rem;border-radius:8px;font-size:0.9rem;'>DEBUG: ${JSON.stringify(q, null, 2)}</pre>`;
+            }
+            document.getElementById('feedback').innerHTML = paginaHtml + sursa + debugHtml;
             // Disable further changes
             document.querySelectorAll('.option-label input').forEach(i => i.disabled = true);
             document.querySelector('.question-btn[type="submit"]').disabled = true;
