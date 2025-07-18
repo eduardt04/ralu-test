@@ -195,7 +195,7 @@ export function initGenerateTestPane(mainContent, chaptersData, bookNames, bookC
       let correct = 0;
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
-        const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.\u0020/, '').trim().toLowerCase();
+        const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.[ ]?/, '').trim().toLowerCase();
         const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
         const userAns = userAnswers[i] || [];
         if (userAns.length === correctAnswers.length && userAns.every(a => correctAnswers.includes(a))) {
@@ -203,48 +203,52 @@ export function initGenerateTestPane(mainContent, chaptersData, bookNames, bookC
         }
       }
       let percent = (correct / questions.length * 100).toFixed(1);
-      // Save user answers and score to Firestore
+      // Save user answers and score to Firestore, then show results after save
+      testPane.innerHTML = '<div style="text-align:center;margin:2rem 0;">Se salvează rezultatele testului...</div>';
       firebase.firestore().collection('generated_tests').doc(testId).update({
         userAnswers: userAnswers,
         score: { correct, total: questions.length, percent }
+      }).then(() => {
+        setTimeout(() => {
+          testPane.innerHTML = `<div class="test-summary">
+            <h2>Rezultatul testului</h2>
+            <div class="score">Scor: <b>${correct} / ${questions.length}</b> (${percent}%)</div>
+            <div class="scrollable-questions">
+              ${questions.map((q, idx) => {
+                const isMultiple = (q["Răspunsuri"] || []).length > 1;
+                let questionText = q["Întrebare răspuns simplu"] || q["Întrebare răspuns multiplu"] || q["întrebare răspuns simplu"] || q["întrebare răspuns multiplu"] || '';
+                questionText = questionText.replace(/^\s*\d+\.?\s*/, '');
+                let options = (q.Variante || []).slice();
+                // Shuffle options for display
+                for (let i = options.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  [options[i], options[j]] = [options[j], options[i]];
+                }
+                const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.[ ]?/, '').trim().toLowerCase();
+                const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
+                const userAns = userAnswers[idx] || [];
+                return `<div class="questionnaire" style="max-width:900px;margin:1.5rem auto;">
+                  <div class="question-number">Întrebarea ${idx + 1} din ${questions.length}</div>
+                  <div class="question-text">${questionText}</div>
+                  <div class="options">
+                    ${options.map(opt => {
+                      const val = normalize(opt);
+                      let style = '';
+                      if (correctAnswers.includes(val) && userAns.includes(val)) style = 'background:#b3e6ff;'; // both correct and selected
+                      else if (correctAnswers.includes(val)) style = 'background:#c6f7d0;'; // correct only
+                      else if (userAns.includes(val)) style = 'background:#ffd6d6;'; // selected but wrong
+                      return `<span class="option-label" style="${style}">${stripLetter(opt)}</span>`;
+                    }).join('')}
+                  </div>
+                  <div class="pagina"><b>Pagina:</b> ${(q['partition'] ? (q['partition'].match(/^([\d]+)/) || [])[1] : (q['pagina'] || 'N/A'))}</div>
+                  <div class="sursa"><b>Sursa:</b> ${q['Sursa'] || ''}</div>
+                  <div class="capitol"><b>Capitol:</b> ${q['Capitol'] || ''}</div>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+        }, 600); // buffer to ensure save
       });
-      testPane.innerHTML = `<div class="test-summary">
-        <h2>Rezultatul testului</h2>
-        <div class="score">Scor: <b>${correct} / ${questions.length}</b> (${percent}%)</div>
-        <div class="scrollable-questions">
-          ${questions.map((q, idx) => {
-            const isMultiple = (q["Răspunsuri"] || []).length > 1;
-            let questionText = q["Întrebare răspuns simplu"] || q["Întrebare răspuns multiplu"] || q["întrebare răspuns simplu"] || q["întrebare răspuns multiplu"] || '';
-            questionText = questionText.replace(/^\s*\d+\.?\s*/, '');
-            let options = (q.Variante || []).slice();
-            // Shuffle options for display
-            for (let i = options.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [options[i], options[j]] = [options[j], options[i]];
-            }
-            const normalize = v => String(v).replace(/^\s*[A-Ea-e]\. /, '').trim().toLowerCase();
-            const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
-            const userAns = userAnswers[idx] || [];
-            return `<div class="questionnaire" style="max-width:900px;margin:1.5rem auto;">
-              <div class="question-number">Întrebarea ${idx + 1} din ${questions.length}</div>
-              <div class="question-text">${questionText}</div>
-              <div class="options">
-                ${options.map(opt => {
-                  const val = normalize(opt);
-                  let style = '';
-                  if (correctAnswers.includes(val) && userAns.includes(val)) style = 'background:#b3e6ff;'; // both correct and selected
-                  else if (correctAnswers.includes(val)) style = 'background:#c6f7d0;'; // correct only
-                  else if (userAns.includes(val)) style = 'background:#ffd6d6;'; // selected but wrong
-                  return `<span class="option-label" style="${style}">${stripLetter(opt)}</span>`;
-                }).join('')}
-              </div>
-              <div class="pagina"><b>Pagina:</b> ${(q['partition'] ? (q['partition'].match(/^(\d+)/) || [])[1] : (q['pagina'] || 'N/A'))}</div>
-              <div class="sursa"><b>Sursa:</b> ${q['Sursa'] || ''}</div>
-              <div class="capitol"><b>Capitol:</b> ${q['Capitol'] || ''}</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
     }
   }
 }
