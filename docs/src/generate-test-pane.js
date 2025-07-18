@@ -204,9 +204,10 @@ export function initGenerateTestPane(mainContent, chaptersData, bookNames, bookC
       }
       let percent = (correct / questions.length * 100).toFixed(1);
       // Save user answers and score to Firestore, then show results after save
+      const userAnswersToSave = userAnswers.map(ansArr => Array.isArray(ansArr) ? ansArr.join('|||') : (ansArr || ''));
       testPane.innerHTML = '<div style="text-align:center;margin:2rem 0;">Se salvează rezultatele testului...</div>';
       firebase.firestore().collection('generated_tests').doc(testId).update({
-        userAnswers: userAnswers,
+        userAnswers: userAnswersToSave,
         score: { correct, total: questions.length, percent }
       }).then(() => {
         setTimeout(() => {
@@ -226,7 +227,7 @@ export function initGenerateTestPane(mainContent, chaptersData, bookNames, bookC
                 }
                 const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.[ ]?/, '').trim().toLowerCase();
                 const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
-                const userAns = userAnswers[idx] || [];
+                const userAns = (userAnswersToSave[idx] || '').split('|||').map(s => s.trim().toLowerCase()).filter(Boolean);
                 return `<div class="questionnaire" style="max-width:900px;margin:1.5rem auto;">
                   <div class="question-number">Întrebarea ${idx + 1} din ${questions.length}</div>
                   <div class="question-text">${questionText}</div>

@@ -46,7 +46,8 @@ export async function initResultsPane(mainContent) {
   });
 
   function renderTestDetails(test) {
-    const userAnswers = test.userAnswers || [];
+    // Parse userAnswers from string to array
+    const userAnswers = (test.userAnswers || []).map(ans => (typeof ans === 'string' ? ans.split('|||').map(s => s.trim().toLowerCase()).filter(Boolean) : []));
     const score = test.score || null;
     mainContent.innerHTML = `<div class="test-details-pane">
       <button id="backToResults" style="margin-bottom:1.5rem;">&larr; Înapoi la rezultate</button>
