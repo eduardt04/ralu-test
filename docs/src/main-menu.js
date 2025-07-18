@@ -6,7 +6,7 @@ window.addEventListener('unhandledrejection', function(event) {
 });
 
 import { chaptersData } from './chapters_id.js';
-import { initQuestionariesPane, populateQuestionariesSidebar } from './questionaries-pane.js';
+import { initQuestionariesPane } from './questionaries-pane.js';
 import { initGenerateTestPane } from './generate-test-pane.js';
 import { initResultsPane } from './results-pane.js';
 
@@ -23,12 +23,10 @@ const bookCollections = {
 
 document.addEventListener('DOMContentLoaded', function () {
   const mainContent = document.getElementById('main-content');
-  // Populate sidebar submenus for questionaries, pass mainContent for right pane updates
-  populateQuestionariesSidebar(chaptersData, bookNames, mainContent);
 
   // Sidebar menu event listeners
   document.querySelector('.menu-title[data-menu="questionaries"]').addEventListener('click', function() {
-    initQuestionariesPane(mainContent);
+    initQuestionariesPane(mainContent, chaptersData, bookNames, bookCollections);
   });
   document.querySelector('.menu-title[data-menu="results"]').addEventListener('click', function() {
     initGenerateTestPane(mainContent, chaptersData, bookNames, bookCollections);
