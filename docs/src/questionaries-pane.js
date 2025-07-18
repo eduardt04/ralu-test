@@ -1,14 +1,15 @@
-// Handles the 'Toate întrebările' pane
-export function initQuestionariesPane(mainContent, chaptersData, bookNames, bookCollections) {
-  // Build book submenus in the right pane (legacy logic)
-  mainContent.innerHTML = '';
+// Handles the 'Toate întrebările' sidebar population
+export function populateQuestionariesSidebar(chaptersData, bookNames) {
+  const submenu = document.getElementById('submenu-questionaries');
+  if (!submenu) return;
+  submenu.innerHTML = '';
   Object.keys(chaptersData).forEach(bookKey => {
     // Book title
     const bookDiv = document.createElement('div');
     bookDiv.className = 'submenu-title book-menu';
     bookDiv.setAttribute('data-menu', bookKey);
     bookDiv.innerHTML = `<span>${bookNames[bookKey] || bookKey}</span><svg class="caret" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></svg>`;
-    mainContent.appendChild(bookDiv);
+    submenu.appendChild(bookDiv);
 
     // Chapters submenu
     const chaptersSubmenu = document.createElement('div');
@@ -22,11 +23,11 @@ export function initQuestionariesPane(mainContent, chaptersData, bookNames, book
       chapterDiv.textContent = chapterName;
       chaptersSubmenu.appendChild(chapterDiv);
     });
-    mainContent.appendChild(chaptersSubmenu);
+    submenu.appendChild(chaptersSubmenu);
   });
 
-  // Use event delegation for all clicks in the right pane
-  mainContent.addEventListener('click', async function (e) {
+  // Sidebar expand/collapse logic
+  submenu.addEventListener('click', function (e) {
     const bookDiv = e.target.closest('.book-menu');
     if (bookDiv) {
       e.stopPropagation();
@@ -35,15 +36,11 @@ export function initQuestionariesPane(mainContent, chaptersData, bookNames, book
       const caret = bookDiv.querySelector('.caret');
       const open = chaptersSubmenu.classList.contains('open');
       // Only close other book submenus
-      mainContent.querySelectorAll('.submenu').forEach((s, i) => {
-        if (s !== chaptersSubmenu) {
-          s.classList.remove('open');
-        }
+      submenu.querySelectorAll('.submenu').forEach((s) => {
+        if (s !== chaptersSubmenu) s.classList.remove('open');
       });
-      mainContent.querySelectorAll('.book-menu .caret').forEach((c, i) => {
-        if (caret !== c) {
-          c.classList.remove('down');
-        }
+      submenu.querySelectorAll('.book-menu .caret').forEach((c) => {
+        if (caret !== c) c.classList.remove('down');
       });
       // Toggle the clicked book submenu
       if (open) {
@@ -55,10 +52,10 @@ export function initQuestionariesPane(mainContent, chaptersData, bookNames, book
       }
       return;
     }
-    const chapterDiv = e.target.closest('.chapter-menu');
-    if (chapterDiv) {
-      // You can add logic here to display questions for the selected chapter
-      mainContent.innerHTML = `<h2>${chapterDiv.textContent}</h2><div>Întrebările pentru acest capitol vor apărea aici.</div>`;
-    }
   });
+}
+
+// Handles the right pane content for 'Toate întrebările'
+export function initQuestionariesPane(mainContent) {
+  mainContent.innerHTML = '<h2>Selectează un capitol din meniul din stânga pentru a vedea întrebările.</h2>';
 }
