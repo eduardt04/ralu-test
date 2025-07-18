@@ -262,11 +262,11 @@ document.addEventListener('DOMContentLoaded', function () {
           ${Object.entries(chaptersData).map(([bookKey, chapters]) => `
             <div class="book-group" style="margin-bottom:1.5rem;">
               <div style="font-weight:bold;font-size:1.1rem;margin-bottom:0.5rem;">${bookNames[bookKey]}</div>
-              <div class="chapter-list" style="display:flex;flex-direction:column;gap:0.5rem;">
+              <div class="chapter-list" style="display:flex;flex-direction:column;gap:0.2rem;">
                 ${Object.entries(chapters).map(([chapterName, chapterId]) => `
-                  <label style="display:flex;align-items:center;gap:0.7rem;font-size:1.05rem;background:#f7f7f7;border-radius:8px;padding:0.7rem 1rem;cursor:pointer;transition:background 0.2s;">
-                    <input type="checkbox" class="chapter-checkbox" data-book="${bookKey}" data-chapter="${chapterId}" data-chapter-name="${chapterName}" style="accent-color:#4f46e5;width:1.1rem;height:1.1rem;" />
-                    <span>${chapterName}</span>
+                  <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.98rem;line-height:1.3;cursor:pointer;">
+                    <input type="checkbox" class="chapter-checkbox" data-book="${bookKey}" data-chapter="${chapterId}" data-chapter-name="${chapterName}" style="accent-color:#4f46e5;width:1rem;height:1rem;" />
+                    <span style="color:#222;">${chapterName}</span>
                   </label>
                 `).join('')}
               </div>
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <label for="numQuestions" style="font-size:1.1rem;"><b>Număr întrebări:</b></label>
           <input type="number" id="numQuestions" name="numQuestions" min="1" max="100" value="20" required style="margin-left:0;width:100px;font-size:1.1rem;padding:0.4rem 0.7rem;border-radius:8px;border:1px solid #ccc;" />
         </div>
-        <button type="submit" class="question-btn" style="width:100%;font-size:1.25rem;padding:1rem 0;margin-top:1.5rem;letter-spacing:0.03em;">Generează testul</button>
+        <button type="submit" class="question-btn" style="width:100%;font-size:1.15rem;padding:0.7rem 0;margin-top:1.5rem;letter-spacing:0.03em;">Generează testul</button>
       </form>
       <div id="generateTestStatus" style="margin-top:1.5rem;"></div>
     </div>`;
