@@ -260,23 +260,26 @@ document.addEventListener('DOMContentLoaded', function () {
       <form id="generateTestForm">
         <div class="book-chapter-list">
           ${Object.entries(chaptersData).map(([bookKey, chapters]) => `
-            <div class="book-group">
-              <label><input type="checkbox" class="book-checkbox" data-book="${bookKey}"> <b>${bookNames[bookKey]}</b></label>
-              <div class="chapter-list">
+            <div class="book-group" style="margin-bottom:1.5rem;">
+              <div style="font-weight:bold;font-size:1.1rem;margin-bottom:0.5rem;">${bookNames[bookKey]}</div>
+              <div class="chapter-list" style="display:flex;flex-direction:column;gap:0.5rem;">
                 ${Object.entries(chapters).map(([chapterName, chapterId]) => `
-                  <label><input type="checkbox" class="chapter-checkbox" data-book="${bookKey}" data-chapter="${chapterId}" data-chapter-name="${chapterName}"> ${chapterName}</label>
+                  <label style="display:flex;align-items:center;gap:0.7rem;font-size:1.05rem;background:#f7f7f7;border-radius:8px;padding:0.7rem 1rem;cursor:pointer;transition:background 0.2s;">
+                    <input type="checkbox" class="chapter-checkbox" data-book="${bookKey}" data-chapter="${chapterId}" data-chapter-name="${chapterName}" style="accent-color:#4f46e5;width:1.1rem;height:1.1rem;" />
+                    <span>${chapterName}</span>
+                  </label>
                 `).join('')}
               </div>
             </div>
           `).join('')}
         </div>
-        <div style="margin:1.5rem 0;">
-          <label for="numQuestions"><b>Număr întrebări:</b></label>
-          <input type="number" id="numQuestions" name="numQuestions" min="1" max="100" value="20" required style="margin-left:1rem;width:80px;">
+        <div style="margin:2rem 0 2.5rem 0;display:flex;align-items:center;gap:1.5rem;">
+          <label for="numQuestions" style="font-size:1.1rem;"><b>Număr întrebări:</b></label>
+          <input type="number" id="numQuestions" name="numQuestions" min="1" max="100" value="20" required style="margin-left:0;width:100px;font-size:1.1rem;padding:0.4rem 0.7rem;border-radius:8px;border:1px solid #ccc;" />
         </div>
-        <button type="submit" class="question-btn">Generează testul</button>
+        <button type="submit" class="question-btn" style="width:100%;font-size:1.25rem;padding:1rem 0;margin-top:1.5rem;letter-spacing:0.03em;">Generează testul</button>
       </form>
-      <div id="generateTestStatus"></div>
+      <div id="generateTestStatus" style="margin-top:1.5rem;"></div>
     </div>`;
 
     // Book checkbox toggles all chapters
@@ -445,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
       let correct = 0;
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
-        const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.\?\s+/, '').trim().toLowerCase();
+        const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.?\s+/, '').trim().toLowerCase();
         const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
         const userAns = userAnswers[i] || [];
         if (userAns.length === correctAnswers.length && userAns.every(a => correctAnswers.includes(a))) {
@@ -467,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
               const j = Math.floor(Math.random() * (i + 1));
               [options[i], options[j]] = [options[j], options[i]];
             }
-            const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.\?\s+/, '').trim().toLowerCase();
+            const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.?\s+/, '').trim().toLowerCase();
             const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
             const userAns = userAnswers[idx] || [];
             return `<div class="questionnaire" style="max-width:900px;margin:1.5rem auto;">
@@ -489,124 +492,6 @@ document.addEventListener('DOMContentLoaded', function () {
           }).join('')}
         </div>
       </div>`;
-      // Save user answers and score to Firestore for review
-      const user = firebase.auth().currentUser;
-      firebase.firestore().collection('generated_tests').doc(testId).update({
-        userAnswers: userAnswers,
-        score: correct,
-        percent: percent,
-        finished: new Date()
-      });
     }
-  }
-
-  // Add the new tab to the sidebar
-  const sidebarMenu = document.querySelector('.sidebar-menu');
-  const resultsTab = document.createElement('div');
-  resultsTab.className = 'menu-category';
-  resultsTab.innerHTML = `
-    <div class="menu-title" data-menu="review-tests">
-      <span>Rezultate teste</span>
-    </div>
-  `;
-  sidebarMenu.appendChild(resultsTab);
-
-  // Handle click for the new tab
-  const reviewTestsMenu = document.querySelector('.menu-title[data-menu="review-tests"]');
-  reviewTestsMenu.addEventListener('click', async function () {
-    mainContent.innerHTML = '<div class="loading-tests">Se încarcă rezultatele testelor...</div>';
-    const user = firebase.auth().currentUser;
-    let query = firebase.firestore().collection('generated_tests');
-    if (user) query = query.where('user', '==', user.uid);
-    query = query.orderBy('finished', 'desc');
-    const snapshot = await query.get();
-    if (snapshot.empty) {
-      mainContent.innerHTML = '<div class="no-tests">Nu există teste finalizate.</div>';
-      return;
-    }
-    let html = `<div class="review-tests-list">
-      <h2>Rezultate teste</h2>
-      <ul class="test-list">
-        ${snapshot.docs.map(doc => {
-          const data = doc.data();
-          const date = data.finished ? new Date(data.finished.seconds ? data.finished.seconds * 1000 : data.finished) : null;
-          const dateStr = date ? date.toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-          const chapters = (data.chapters || []).map(ch => `${bookNames[ch.book] || ch.book} - ${ch.chapterName}`).join(', ');
-          return `<li class="test-list-item" data-test-id="${doc.id}">
-            <div><b>ID:</b> ${doc.id}</div>
-            <div><b>Data:</b> ${dateStr}</div>
-            <div><b>Întrebări:</b> ${data.numQuestions || (data.questions ? data.questions.length : '-')}</div>
-            <div><b>Capitole:</b> ${chapters}</div>
-            <div><b>Scor:</b> ${data.score !== undefined ? `${data.score} / ${data.numQuestions} (${data.percent}%)` : '-'}</div>
-            <button class="question-btn view-test-btn">Vezi testul</button>
-          </li>`;
-        }).join('')}
-      </ul>
-    </div><div id="reviewTestPane"></div>`;
-    mainContent.innerHTML = html;
-    // Add event listeners for view buttons
-    mainContent.querySelectorAll('.view-test-btn').forEach(btn => {
-      btn.addEventListener('click', async function() {
-        const testId = this.closest('.test-list-item').getAttribute('data-test-id');
-        const doc = await firebase.firestore().collection('generated_tests').doc(testId).get();
-        const data = doc.data();
-        if (!data) return;
-        renderTestReview(data, testId);
-      });
-    });
-  });
-
-  // Helper to render a reviewed test (same as summary)
-  function renderTestReview(data, testId) {
-    const questions = data.questions || [];
-    const userAnswers = data.userAnswers || [];
-    let correct = 0;
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
-      const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.\?\s+/, '').trim().toLowerCase();
-      const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
-      const userAns = userAnswers[i] || [];
-      if (userAns.length === correctAnswers.length && userAns.every(a => correctAnswers.includes(a))) {
-        correct++;
-      }
-    }
-    let percent = (correct / questions.length * 100).toFixed(1);
-    const testPane = document.getElementById('reviewTestPane');
-    testPane.innerHTML = `<div class="test-summary">
-      <h2>Rezultatul testului</h2>
-      <div class="score">Scor: <b>${correct} / ${questions.length}</b> (${percent}%)</div>
-      <div class="scrollable-questions">
-        ${questions.map((q, idx) => {
-          const isMultiple = (q["Răspunsuri"] || []).length > 1;
-          let questionText = q["Întrebare răspuns simplu"] || q["Întrebare răspuns multiplu"] || q["întrebare răspuns simplu"] || q["întrebare răspuns multiplu"] || '';
-          questionText = questionText.replace(/^\s*\d+\.?\s*/, '');
-          let options = (q.Variante || []).slice();
-          // Shuffle options for display
-          for (let i = options.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [options[i], options[j]] = [options[j], options[i]];
-          }
-          const normalize = v => String(v).replace(/^\s*[A-Ea-e]\.\?\s+/, '').trim().toLowerCase();
-          const correctAnswers = (q["Răspunsuri"] || []).map(normalize);
-          const userAns = userAnswers[idx] || [];
-          return `<div class="questionnaire" style="max-width:900px;margin:1.5rem auto;">
-            <div class="question-number">Întrebarea ${idx + 1} din ${questions.length}</div>
-            <div class="question-text">${questionText}</div>
-            <div class="options">
-              ${options.map(opt => {
-                const val = normalize(opt);
-                let style = '';
-                if (correctAnswers.includes(val)) style = 'background:#c6f7d0;';
-                if (userAns.includes(val) && !correctAnswers.includes(val)) style = 'background:#ffd6d6;';
-                return `<span class="option-label" style="${style}">${opt}</span>`;
-              }).join('')}
-            </div>
-            <div class="pagina"><b>Pagina:</b> ${(q['partition'] ? (q['partition'].match(/^(\d+)/) || [])[1] : (q['pagina'] || ''))}</div>
-            <div class="sursa"><b>Sursa:</b> ${q['Sursa'] || ''}</div>
-            <div class="capitol"><b>Capitol:</b> ${q['Capitol'] || ''}</div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
   }
 });
