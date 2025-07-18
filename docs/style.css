@@ -275,7 +275,25 @@ body {
   height: 100%;
 }
 
-/* --- Keep chapter names in tickboxes white --- */
+/* --- Match background gradient for smooth scroll, mirror original gradient --- */
+html, body {
+  height: 100%;
+  font-family: 'Poppins', 'Montserrat', Arial, sans-serif;
+  background: linear-gradient(135deg, #232526 0%, #3a6186 100%);
+  /* fallback for browsers that don't support gradients */
+  background-color: #232526;
+}
+body {
+  min-height: 100vh;
+  height: 100%;
+}
+
+.main-content, #main-content {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #232526 0%, #3a6186 100%);
+}
+
+/* Keep chapter names in tickboxes white */
 .chapter-list label span,
 .chapter-checkbox + span {
   color: #fff !important;
