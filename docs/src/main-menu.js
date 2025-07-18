@@ -24,7 +24,7 @@ const bookCollections = {
 document.addEventListener('DOMContentLoaded', function () {
   const mainContent = document.getElementById('main-content');
   // Populate sidebar submenus for questionaries
-  populateQuestionariesSidebar(chaptersData, bookNames);
+  populateQuestionariesSidebar(chaptersData, bookNames, bookCollections);
 
   // Sidebar menu event listeners
   document.querySelector('.menu-title[data-menu="questionaries"]').addEventListener('click', function(e) {
