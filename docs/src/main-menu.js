@@ -494,4 +494,30 @@ document.addEventListener('DOMContentLoaded', function () {
       </div>`;
     }
   }
+
+  // Add Results tab (Rezultate teste) to sidebar if missing
+  const sidebarMenu = document.querySelector('.sidebar-menu');
+  if (sidebarMenu && !document.querySelector('.menu-title[data-menu="test-results"]')) {
+    const resultsCategory = document.createElement('div');
+    resultsCategory.className = 'menu-category';
+    resultsCategory.innerHTML = `
+      <div class="menu-title" data-menu="test-results">
+        <span>Rezultate teste</span>
+      </div>
+    `;
+    sidebarMenu.appendChild(resultsCategory);
+  }
+
+  // Add event listener for Rezultate teste tab
+  const testResultsMenu = document.querySelector('.menu-title[data-menu="test-results"]');
+  if (testResultsMenu) {
+    testResultsMenu.addEventListener('click', function () {
+      // Call your function to render test results here
+      if (typeof renderTestResults === 'function') {
+        renderTestResults();
+      } else {
+        mainContent.innerHTML = '<div>Rezultatele testelor vor apărea aici.</div>';
+      }
+    });
+  }
 });

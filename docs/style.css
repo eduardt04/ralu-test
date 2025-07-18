@@ -7,9 +7,9 @@
 html, body {
   height: 100%;
   font-family: 'Poppins', 'Montserrat', Arial, sans-serif;
-  background: linear-gradient(to bottom, #f4f1ff 0%, #6a11cb 100%);
+  background: linear-gradient(135deg, #232526 0%, #3a6186 100%);
   /* fallback for browsers that don't support gradients */
-  background-color: #f4f1ff;
+  background-color: #232526;
 }
 body {
   min-height: 100vh;
@@ -262,13 +262,25 @@ button[type="submit"]:hover {
   }
 }
 
-/* Make chapter names in tickboxes white */
+/* --- Fix background for smooth transition --- */
+html, body {
+  height: 100%;
+  font-family: 'Poppins', 'Montserrat', Arial, sans-serif;
+  background: linear-gradient(135deg, #232526 0%, #3a6186 100%);
+  /* fallback for browsers that don't support gradients */
+  background-color: #232526;
+}
+body {
+  min-height: 100vh;
+  height: 100%;
+}
+
+/* --- Keep chapter names in tickboxes white --- */
 .chapter-list label span,
 .chapter-checkbox + span {
   color: #fff !important;
 }
 
-/* Ensure main content stretches to full height */
 #main-content {
   min-height: 80vh;
 }
