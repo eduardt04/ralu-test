@@ -23,8 +23,8 @@ const bookCollections = {
 
 document.addEventListener('DOMContentLoaded', function () {
   const mainContent = document.getElementById('main-content');
-  // Populate sidebar submenus for questionaries
-  populateQuestionariesSidebar(chaptersData, bookNames);
+  // Populate sidebar submenus for questionaries, pass mainContent for right pane updates
+  populateQuestionariesSidebar(chaptersData, bookNames, mainContent);
 
   // Sidebar menu event listeners
   document.querySelector('.menu-title[data-menu="questionaries"]').addEventListener('click', function() {
@@ -39,15 +39,4 @@ document.addEventListener('DOMContentLoaded', function () {
       initResultsPane(mainContent);
     });
   }
-
-  // Handle chapter click in sidebar
-  document.getElementById('submenu-questionaries').addEventListener('click', function(e) {
-    const chapterDiv = e.target.closest('.chapter-menu');
-    if (chapterDiv) {
-      const bookKey = chapterDiv.getAttribute('data-book');
-      const chapterId = chapterDiv.getAttribute('data-chapter');
-      // Load questions for this chapter in the right pane
-      mainContent.innerHTML = `<h2>${chapterDiv.textContent}</h2><div>Întrebările pentru acest capitol vor apărea aici.</div>`;
-    }
-  });
 });

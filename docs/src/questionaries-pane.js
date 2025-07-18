@@ -1,5 +1,5 @@
-// Handles the 'Toate întrebările' sidebar population
-export function populateQuestionariesSidebar(chaptersData, bookNames) {
+// Handles the 'Toate întrebările' sidebar population and logic
+export function populateQuestionariesSidebar(chaptersData, bookNames, mainContent) {
   const submenu = document.getElementById('submenu-questionaries');
   if (!submenu) return;
   submenu.innerHTML = '';
@@ -26,7 +26,7 @@ export function populateQuestionariesSidebar(chaptersData, bookNames) {
     submenu.appendChild(chaptersSubmenu);
   });
 
-  // Sidebar expand/collapse logic
+  // Sidebar expand/collapse logic for books
   submenu.addEventListener('click', function (e) {
     const bookDiv = e.target.closest('.book-menu');
     if (bookDiv) {
@@ -51,6 +51,16 @@ export function populateQuestionariesSidebar(chaptersData, bookNames) {
         caret.classList.add('down');
       }
       return;
+    }
+    // Handle chapter click in sidebar
+    const chapterDiv = e.target.closest('.chapter-menu');
+    if (chapterDiv) {
+      const bookKey = chapterDiv.getAttribute('data-book');
+      const chapterId = chapterDiv.getAttribute('data-chapter');
+      // Load questions for this chapter in the right pane
+      if (mainContent) {
+        mainContent.innerHTML = `<h2>${chapterDiv.textContent}</h2><div>Întrebările pentru acest capitol vor apărea aici.</div>`;
+      }
     }
   });
 }
